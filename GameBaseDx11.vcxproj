@@ -148,7 +148,7 @@
     <ClCompile Include="Engine\Text.cpp" />
     <ClCompile Include="Engine\Texture.cpp" />
     <ClCompile Include="Engine\Transform.cpp" />
-    <ClCompile Include="FIELD.cpp" />
+    <ClCompile Include="Stage.cpp" />
     <ClCompile Include="TestScene.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -175,7 +175,7 @@
     <ClInclude Include="Engine\Text.h" />
     <ClInclude Include="Engine\Texture.h" />
     <ClInclude Include="Engine\Transform.h" />
-    <ClInclude Include="FIELD.h" />
+    <ClInclude Include="Stage.h" />
     <ClInclude Include="TestScene.h" />
   </ItemGroup>
   <ItemGroup>

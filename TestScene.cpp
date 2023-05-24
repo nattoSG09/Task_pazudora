@@ -1,5 +1,5 @@
 #include "TestScene.h"
-#include "FIELD.h"
+#include "Stage.h"
 
 //コンストラクタ
 TestScene::TestScene(GameObject * parent)
@@ -10,7 +10,7 @@ TestScene::TestScene(GameObject * parent)
 //初期化
 void TestScene::Initialize()
 {
-	Instantiate<FIELD>(this);
+	Instantiate<Stage>(this);
 }
 
 //更新
