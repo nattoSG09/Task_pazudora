@@ -1,5 +1,7 @@
 #pragma once
 #include "Engine/GameObject.h"
+#include <string>
+using std::string;
 
 class Stage : public GameObject {
 public:
@@ -10,6 +12,8 @@ public:
 	void Draw() override;
 	void Release() override;
 
+
+	//t4 p1 g 2
 private:
 	enum COLOR {
 		NOCOLOR = -1,
@@ -39,6 +43,8 @@ private:
 	XMFLOAT3 mousePos;
 	int selectX, selectY; // 選ばれた場所
 	COLOR selectColor;
+
+	int eraseTime;//消える演出タイマー
 
 	// dottozahyou kara 3dzahyou ni hennkann
 	XMFLOAT3 ConvDrawPos(float x, float y);
@@ -85,4 +91,9 @@ private:
 	/// </summary>
 	/// <returns>消えるのがあったらtrue</returns>
 	bool CheckErase();
+
+	/// <summary>
+	/// 落ちるための準備をする
+	/// </summary>
+	void PreparaFell();
 };

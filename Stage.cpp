@@ -35,14 +35,14 @@ Stage::~Stage()
 {
 }
 
+
+
 void Stage::Initialize()
 {
-	hImage[COLOR::RED]    = Image::Load("ball/ball0.png");
-	hImage[COLOR::BLUE]   = Image::Load("ball/ball1.png");
-	hImage[COLOR::YELLOW] = Image::Load("ball/ball2.png");
-	hImage[COLOR::GREEN]  = Image::Load("ball/ball3.png");
-	hImage[COLOR::PURPLE] = Image::Load("ball/ball4.png");
-	hImage[COLOR::HEART]  = Image::Load("ball/ball5.png");
+	for (int i = 0; i < COLOR::NUM; i++) {
+		string ball = "ball/ball";
+		hImage[i] = Image::Load( ball + std::to_string(i) + ".png");
+	}
 	state = STATE::S_IDLE;
 }
 
@@ -149,7 +149,12 @@ void Stage::UpdateMove()
 #endif
 	}
 	if (Input::IsMouseButtonUp(0)) { // 左クリック
+		selectColor = COLOR::NOCOLOR;
+		selectX = -1;
+		selectY = -1;
+
 		if (CheckErase()) {
+			eraseTime = 30;
 			state = STATE::S_ERASE;
 		} else {
 			state = STATE::S_IDLE;
@@ -183,10 +188,46 @@ void Stage::UpdateMove()
 
 void Stage::UpdateErase()
 {
+	eraseTime--;
+	if (eraseTime <= 0) {
+		PreparaFell();
+		state = STATE::S_FALL;
+	}
 }
 
 void Stage::UpdateFall()
 {
+	//なめらかに移動する演出
+	for (int h = 0; h < HEIGHT; h++) {
+		for (int w = 0; w < WIDTH; w++) {
+			auto& b = field[h][w];
+			if (b.rate < 1.0f) {
+				b.rate += 0.12f;
+				if (b.rate > 1.0f)
+					b.rate = 1.0f;
+				b.x = GetRateValue(b.bx, w * 40, b.rate);
+				b.y = GetRateValue(b.by, h * 40, b.rate);
+			}
+		}
+	}
+	//すべて落ちたら　すべてのfield[h][w].rate>=1.0になったら
+	bool found = false;
+	for (int h = 0; h < HEIGHT; h++) {
+		for (int w = 0; w < WIDTH; w++) {
+			if (field[h][w].rate < 1.0f) {//落ちてる途中
+				//関数を抜ける
+				return;
+			}
+		}
+	}
+
+	if (CheckErase()) {
+		eraseTime = 30;
+		state = STATE::S_ERASE;
+	}
+	else {
+		state = STATE::S_IDLE;
+	}
 }
 
 void Stage::UpdateAttack()
@@ -240,5 +281,37 @@ bool Stage::CheckErase()
 		}
 	}
 	return ret;
+}
+
+void Stage::PreparaFell()
+{
+	
+	//逆順のfor文の回し方
+	for (int w = 0; w < WIDTH; w++) {
+		int hole = 0;
+		for (int h = HEIGHT-1; h >= 0; h--) {
+			if (field[h][w].doErase > 0) {
+				hole += 1;
+			}
+			else {
+				//field[h][w]をholeの数、落下させる
+				field[h + hole][w] = field[h][w];
+				field[h + hole][w].by = field[h + hole][w].y;
+				field[h + hole][w].bx = field[h + hole][w].x;
+				field[h + hole][w].rate = 0.0f;
+
+			}
+		}
+		//玉を補充する
+		for (int b = 0; b < hole; b++) {
+			field[b][w].color = (COLOR)(rand() % COLOR::NUM);
+			field[b][w].rate = 0.0f;
+			field[b][w].doErase = 0;
+			field[b][w].x = w * 40;
+			field[b][w].bx = w * 40;
+			field[b][w].y = (-hole + b) * 40;
+			field[b][w].by = (-hole + b) * 40;
+		}
+	}
 }
 
